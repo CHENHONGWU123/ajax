@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+    <script src="/JS文件/jQuery.min.js"></script>
+</head>
+<body style="padding: 40px;">
+    <!-- 品论列表 -->
+    
+    <div class="panel panel-primary">
+          <div class="panel-heading">
+                <h3 class="panel-title">发表品论</h3>
+          </div>
+          <form class="panel-body" id="formAddCmt">
+                <div>品论人：</div>
+                <input type="text" class="form-control" name="username">
+                <div>评论内容：</div>
+                <textarea  class="form-control" name="content"></textarea>
+                <button type="submit" class="btn btn-primary">发表评论</button>
+          </form>
+    </div>
+    <!-- 评论列表 -->
+    
+    <ul class="list-group" id="cmd-list">
+        <li class="list-group-item">
+            <span class="badge" style="background-color:pink;"> 评论时间</span>
+            
+            <span class="badge">品论人：</span>
+            Item 1
+        </li>
+   
+    </ul>
+    
+
+
+    <script>
+        function getcomment(){
+            $.ajax({
+            method:'GET',
+            url:'http://www.liulongbin.top:3006/api/cmtlist',
+            success:function(res){
+                
+                if(res.status !== 200) return alert('获取失败')
+                var rows = []
+                $.each(res.data,function(i, item){
+                    var str = '<li class="list-group-item"><span class="badge"style="background-color:pik;"> 评论时间:'+item.time+'</span><span class="badge">品论人'+item.username+'</span>'+item.content+'</li>'
+                    rows.push(str)
+                })
+                $('#cmd-list').empty().append(rows.join(''))
+            }
+        })
+
+        }
+     
+        getcomment()
+        
+
+        $(function(){
+            $('#formAddCmt').submit(function (e){
+                //阻止默认行为
+                e.preventDefault()
+                //快速获取表单内容
+                var data = $(this).serialize()
+                //用ajxa将数据发送给服务器
+                $.post('http://www.liulongbin.top:3006/api/addcmt',data,function(res){
+                   if(res.status !== 201)
+                   return alert('发表失败')
+                   
+                })
+                //发表成功重新调用
+                getcomment()
+                //清空表单内容
+                $('#formAddCmt')[0].reset()
+            })
+        })
+
+    </script>
+</body>
+</html>
